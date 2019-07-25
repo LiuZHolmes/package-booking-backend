@@ -27,24 +27,13 @@ public class PackageController {
 
     @PutMapping("/packages/{id}")
     public ResponseEntity updatePackageByID(@PathVariable Long id, @RequestBody Package aPackage) throws Exception {
-        Package newPackage = packageRepository.findById(id).orElseThrow(Exception::new);
-        newPackage.setStatus(aPackage.getStatus());
-        if (aPackage.getAppointment_time() != null) {
-            if (isAppointmentTimeEligible(aPackage.getAppointment_time())) {
-                newPackage.setAppointment_time(aPackage.getAppointment_time());
-                newPackage.setStatus("already_appointment");
-                return ResponseEntity.ok(packageRepository.save(newPackage));
-            } else return ResponseEntity.badRequest().build();
+        Package newPackage;
+        try {
+            newPackage = packageService.updatePackageByID(id,aPackage);
+            return ResponseEntity.ok(newPackage);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
-        else return ResponseEntity.ok(packageRepository.save(newPackage));
     }
 
-    private boolean isAppointmentTimeEligible(Long time) {
-        Date date = new Date(time);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        if (cal.get(Calendar.HOUR_OF_DAY) <= 20 && cal.get(Calendar.HOUR_OF_DAY) >= 9) {
-            return true;
-        } else return false;
-    }
 }
