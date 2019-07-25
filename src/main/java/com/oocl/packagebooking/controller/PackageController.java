@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:8082")
 public class PackageController {
     @Autowired
     private PackageRepository packageRepository;
