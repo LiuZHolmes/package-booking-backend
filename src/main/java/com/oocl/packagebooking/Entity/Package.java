@@ -63,7 +63,8 @@ public class Package {
     public Package() {
     }
 
-    public Package(String receiver, String phoneNumber, String status, Date appointment_time) {
+    public Package(Long id, String receiver, String phoneNumber, String status, Date appointment_time) {
+        this.id = id;
         this.receiver = receiver;
         this.phoneNumber = phoneNumber;
         this.status = status;
