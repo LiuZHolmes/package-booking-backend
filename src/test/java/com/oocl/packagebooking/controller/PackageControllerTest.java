@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -43,11 +44,11 @@ public class PackageControllerTest {
     @Test
     public void should_return_packages_when_get_it() throws Exception {
         // given
-
+        when(packageRepository.findAll()).thenReturn(packageList);
         // when
         mockMvc.perform(get("/packages"))
                 // then
-                .andExpect(jsonPath("$.length")
+                .andExpect(jsonPath("$.length()")
                         .value(2));
     }
 }
