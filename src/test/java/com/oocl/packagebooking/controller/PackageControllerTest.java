@@ -118,4 +118,26 @@ public class PackageControllerTest {
                 // then
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void should_update_status_when_appointment_time_in_range() throws Exception {
+        // given
+        Package aPackage = packageList.get(0);
+        when(packageRepository.findById(anyLong())).thenReturn(java.util.Optional.ofNullable(aPackage));
+        Calendar calendar= Calendar.getInstance();
+        calendar.set(2015, Calendar.FEBRUARY, 12,15,00,00);
+        String time = String.valueOf(calendar.getTime().getTime());
+        aPackage.setStatus("already_appointment");
+        when(packageRepository.save(any(Package.class))).thenReturn(aPackage);
+        // when
+        mockMvc.perform(put("/packages/" + aPackage.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\n" +
+                        "    \"status\": \"already_appointment\",\n" +
+                        "    \"appointment_time\": " + time + "\n" +
+                        "}"))
+                // then
+                .andExpect(jsonPath("$.status")
+                        .value("already_appointment"));
+    }
 }
