@@ -38,7 +38,7 @@ public class PackageControllerTest {
     public void setUp() throws Exception {
         packageList = new ArrayList<>();
         packageList.add(new Package("张三", "123456", "no_appointment", new Date()));
-        packageList.add(new Package("李四", "789456", "no_appointment", new Date()));
+        packageList.add(new Package("李四", "789456", "already_appointment", new Date()));
     }
 
     @Test
@@ -50,5 +50,19 @@ public class PackageControllerTest {
                 // then
                 .andExpect(jsonPath("$.length()")
                         .value(2));
+    }
+
+    @Test
+    public void should_return_filtered_packages_when_get_it() throws Exception {
+        // given
+        when(packageRepository.findAll()).thenReturn(packageList);
+        // when
+        mockMvc.perform(get("/packages")
+                .param("status","already_appointment"))
+                // then
+                .andExpect(jsonPath("$.length()")
+                        .value(1))
+                .andExpect(jsonPath("$[0].status")
+                        .value("already_appointment"));
     }
 }
