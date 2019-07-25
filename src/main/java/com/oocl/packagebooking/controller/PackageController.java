@@ -30,6 +30,7 @@ public class PackageController {
         if (aPackage.getAppointment_time() != null) {
             if (isAppointmentTimeEligible(aPackage.getAppointment_time())) {
                 newPackage.setAppointment_time(aPackage.getAppointment_time());
+                newPackage.setStatus("already_appointment");
                 return ResponseEntity.ok(packageRepository.save(newPackage));
             } else return ResponseEntity.badRequest().build();
         }
