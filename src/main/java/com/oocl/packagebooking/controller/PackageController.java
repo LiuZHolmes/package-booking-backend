@@ -1,6 +1,7 @@
 package com.oocl.packagebooking.controller;
 
 import com.oocl.packagebooking.Repository.PackageRepository;
+import com.oocl.packagebooking.Service.PackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,12 @@ public class PackageController {
     @Autowired
     private PackageRepository packageRepository;
 
+    @Autowired
+    private PackageService packageService;
+
     @GetMapping("/packages")
     public ResponseEntity getPackages(@RequestParam(name = "status", defaultValue = "all") String status) {
-        if (status.equals("all"))
-            return ResponseEntity.ok(packageRepository.findAll());
-        else
-            return ResponseEntity.ok(packageRepository.findAll().stream().filter(x -> x.getStatus().equals(status)).collect(Collectors.toList()));
+        return ResponseEntity.ok(packageService.getPackages(status));
     }
 
     @PutMapping("/packages/{id}")
