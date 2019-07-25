@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.oocl.packagebooking.Entity.Package;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,10 +24,24 @@ public class PackageController {
     }
 
     @PutMapping("/packages/{id}")
-    public ResponseEntity updatePackageOnStatusByID(@PathVariable Long id, @RequestBody Package aPackage) throws Exception {
+    public ResponseEntity updatePackageByID(@PathVariable Long id, @RequestBody Package aPackage) throws Exception {
         Package newPackage = packageRepository.findById(id).orElseThrow(Exception::new);
         newPackage.setStatus(aPackage.getStatus());
-        return ResponseEntity.ok(packageRepository.save(newPackage));
+        if (aPackage.getAppointment_time() != null) {
+            if (isAppointmentTimeEligible(aPackage.getAppointment_time())) {
+                newPackage.setAppointment_time(aPackage.getAppointment_time());
+                return ResponseEntity.ok(packageRepository.save(newPackage));
+            } else return ResponseEntity.badRequest().build();
+        }
+        else return ResponseEntity.ok(packageRepository.save(newPackage));
     }
 
+    private boolean isAppointmentTimeEligible(Long time) {
+        Date date = new Date(time);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        if (cal.get(Calendar.HOUR_OF_DAY) <= 20 && cal.get(Calendar.HOUR_OF_DAY) >= 9) {
+            return true;
+        } else return false;
+    }
 }

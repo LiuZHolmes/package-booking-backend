@@ -11,10 +11,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -41,9 +44,16 @@ public class PackageControllerTest {
     @Before
     public void setUp() throws Exception {
         packageList = new ArrayList<>();
-        packageList.add(new Package(1L,"张三", "123456", "no_appointment", new Date()));
-        packageList.add(new Package(2L,"李四", "789456", "already_appointment", new Date()));
-        packageList.add(new Package(3L,"王五", "963258", "taken", new Date()));
+        Calendar calendar= Calendar.getInstance();
+        calendar.set(2015, Calendar.FEBRUARY, 12,15,00,00);
+        Date first_date = calendar.getTime();
+        calendar.set(2016, Calendar.FEBRUARY, 12,16,00,00);
+        Date second_date = calendar.getTime();
+        calendar.set(2017, Calendar.FEBRUARY, 12,17,00,00);
+        Date third_date = calendar.getTime();
+        packageList.add(new Package(1L,"张三", "123456", "no_appointment", first_date.getTime()));
+        packageList.add(new Package(2L,"李四", "789456", "already_appointment", second_date.getTime()));
+        packageList.add(new Package(3L,"王五", "963258", "taken", third_date.getTime()));
     }
 
     @Test
@@ -87,5 +97,25 @@ public class PackageControllerTest {
                 // then
                 .andExpect(jsonPath("$.status")
                         .value("taken"));
+    }
+
+    @Test
+    public void should_error_when_appointment_time_out_of_range() throws Exception {
+        // given
+        Package aPackage = packageList.get(0);
+        when(packageRepository.findById(anyLong())).thenReturn(java.util.Optional.ofNullable(aPackage));
+        Calendar calendar= Calendar.getInstance();
+        calendar.set(2015, Calendar.FEBRUARY, 12,21,00,00);
+        String time = String.valueOf(calendar.getTime().getTime());
+        when(packageRepository.save(any(Package.class))).thenReturn(aPackage);
+        // when
+        mockMvc.perform(put("/packages/" + aPackage.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\n" +
+                        "    \"status\": \"already_appointment\",\n" +
+                        "    \"appointment_time\": " + time + "\n" +
+                        "}"))
+                // then
+                .andExpect(status().isBadRequest());
     }
 }

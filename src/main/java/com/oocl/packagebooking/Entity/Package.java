@@ -18,7 +18,7 @@ public class Package {
 
     private String status;
 
-    private Date appointment_time;
+    private Long appointment_time;
 
     public Long getId() {
         return id;
@@ -52,18 +52,18 @@ public class Package {
         this.status = status;
     }
 
-    public Date getAppointment_time() {
+    public Long getAppointment_time() {
         return appointment_time;
     }
 
-    public void setAppointment_time(Date appointment_time) {
+    public void setAppointment_time(Long appointment_time) {
         this.appointment_time = appointment_time;
     }
 
     public Package() {
     }
 
-    public Package(Long id, String receiver, String phoneNumber, String status, Date appointment_time) {
+    public Package(Long id, String receiver, String phoneNumber, String status, Long appointment_time) {
         this.id = id;
         this.receiver = receiver;
         this.phoneNumber = phoneNumber;
